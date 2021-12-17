@@ -10,7 +10,7 @@ import {
   FormControlLabel,
   makeStyles,
 } from "@material-ui/core";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import DoneIcon from "@material-ui/icons/Done";
 import clsx from "clsx";
 import axios from "axios";
@@ -65,7 +65,7 @@ export default function VerticalLinearStepper() {
   const [activeStep, setActiveStep] = useState(0);
   const [randomFact, setRandomFact] = useState(null);
 
-  const getActive = () => {
+  const getActive = useCallback(() => {
     /**
      * returns the index of first step with a task 'not done'
      */
@@ -73,7 +73,7 @@ export default function VerticalLinearStepper() {
       step.tasks.find((t) => t.done === false)
     );
     return active;
-  };
+  }, [steps]);
 
   const handleChange = (task, label) => {
     /**
@@ -107,7 +107,7 @@ export default function VerticalLinearStepper() {
     const currentActive = getActive();
     setActiveStep(currentActive);
     setLocalSteps(steps);
-  }, [steps]);
+  }, [steps, getActive, setLocalSteps]);
 
   useEffect(() => {
     const loadFact = async () => {
@@ -127,7 +127,7 @@ export default function VerticalLinearStepper() {
   }, [activeStep]);
   return (
     <>
-      <Stepper orientation="vertical" connector={null}>
+      <Stepper activeStep={activeStep} orientation="vertical" connector={null}>
         {steps?.map((step, index) => {
           return (
             <Step key={step.label}>
@@ -146,14 +146,13 @@ export default function VerticalLinearStepper() {
                   {(activeStep === -1 || activeStep > index) && <DoneIcon />}
                 </Box>
               </StepLabel>
-              {step.tasks.map((task, key) => (
-                <div>
+              {step.tasks.map((task, key) => {
+                return (
                   <FormControlLabel
                     key={key}
                     label={<Box fontSize={14}>{task.label}</Box>}
                     control={
                       <Checkbox
-                        disabled={activeStep !== index}
                         checked={task.done}
                         onChange={(e) => {
                           handleChange(task, step.label);
@@ -161,8 +160,8 @@ export default function VerticalLinearStepper() {
                       />
                     }
                   />
-                </div>
-              ))}
+                );
+              })}
             </Step>
           );
         })}

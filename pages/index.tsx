@@ -10,7 +10,7 @@ function index() {
       }}
     >
       <h3>My startup progress</h3>
-      {process.browser ? <VerticalLinearStepper /> : <div>"loading..."</div>}
+      {process.browser ? <VerticalLinearStepper /> : <div>loading...</div>}
     </Box>
   );
 }
